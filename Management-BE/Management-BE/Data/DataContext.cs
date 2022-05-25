@@ -11,5 +11,12 @@ namespace Management_BE.Data
         public DbSet<Role> Roles { get; set; }
         public DbSet<Document> Documents { get; set; }
 
+        protected override void OnModelCreating(ModelBuilder modelBuilder)
+        {
+            modelBuilder.Entity<User>().ToTable("users");
+            modelBuilder.Entity<User>().ToTable("roles");
+            modelBuilder.Entity<User>().ToTable("documents");
+        }
+
     }
 }
