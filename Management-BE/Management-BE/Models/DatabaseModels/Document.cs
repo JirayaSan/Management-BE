@@ -1,4 +1,6 @@
-﻿namespace Management_BE.Models
+﻿using System.Text.Json.Serialization;
+
+namespace Management_BE.Models.DatabaseModels
 {
     public class Document
     {
@@ -7,7 +9,7 @@
         public string Title { get; set; } = string.Empty;
         public string Description { get; set; } = string.Empty;
         public string? Comment { get; set; }
-        public DateTime? DateDocument { get; set; }
+        public DateTime DateDocument { get; set; }
         public string FilePath { get; set; } = string.Empty;
         public DateTime DateInsertDocument { get; set; }
 

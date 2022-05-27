@@ -1,4 +1,11 @@
 using Management_BE.Data;
+using Management_BE.Data.AuthenticationData;
+using Management_BE.Interfaces.Authentication;
+using Management_BE.Interfaces.Documents;
+using Management_BE.Interfaces.Hasher;
+using Management_BE.Repositories.Authentication;
+using Management_BE.Repositories.Documents;
+using Management_BE.Services;
 using Microsoft.EntityFrameworkCore;
 
 // Variable to enable Cors Origins
@@ -13,11 +20,19 @@ builder.Services.AddControllers();
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 
-// Data Context DB connection
-builder.Services.AddDbContext<DataContext>(options =>
+/* Section Data Context DB connection */
+builder.Services.AddDbContext<ApplicationDataContext>(options =>
 {
     options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection"));
 });
+
+/* Scope Repository */
+// Autenthication Repository
+builder.Services.AddScoped<IAuthenticationRepository, AuthenticationRepository>();
+// Password Repository
+builder.Services.AddScoped<IPasswordHasher, PasswordHasher>();
+// Document Repository
+builder.Services.AddScoped<IDocumentRepository, DocumentRepository>();
 
 // Enable Cors
 builder.Services.AddCors(options =>
