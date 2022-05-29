@@ -5,6 +5,7 @@ using Management_BE.Models.DataModels;
 using Management_BE.Interfaces.Authentication;
 using Management_BE.Services;
 using Management_BE.Interfaces.Hasher;
+using static Management_BE.Models.DataModels.AuthenticationRequest;
 
 namespace Management_BE.Controllers.AuthenticationControllers
 {
@@ -15,14 +16,6 @@ namespace Management_BE.Controllers.AuthenticationControllers
         private readonly IAuthenticationRepository _iAuthenticationRepository;
         private readonly IPasswordHasher _iPasswordHasher;
 
-        // Riferimento alle tabelle 
-        //private readonly AuthenticationDataContext _authenticationDataContext;
-
-        // Costruttore di inizializzazione
-        //public AuthenticationController(AuthenticationDataContext authenticationContext)
-        //{
-        //    _authenticationDataContext = authenticationContext;
-        //}
         public AuthenticationController(IAuthenticationRepository iAuthenticationRepository,
                                         IPasswordHasher iPasswordHasher)
         {
@@ -30,38 +23,14 @@ namespace Management_BE.Controllers.AuthenticationControllers
             _iPasswordHasher = iPasswordHasher;
         }
 
-        //// POST: api/Registration
-        //// To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
-        //[HttpPost("Registration")]
-        //public async Task<ActionResult<User>> PostRegistration(User registerRequest)
-        //{
-        //    if (_authenticationDataContext.Users == null)
-        //    {
-        //        return Problem("Entity set 'DataContext.Users' is null.");
-        //    }
-
-        //    // Verifica email se presente nel DB
-
-        //    // Verifica username se presente nel DB
-
-        //    // Criptazione password
-
-        //    // Inizializzo l'oggetto da inviare
-
-        //    // Aggiungo i dati ricevuti nel data context
-        //    _authenticationDataContext.Users.Add(registerRequest);
-        //    // Eseguo il salvataggio dei cambiamenti in modo asyncrono (attendo l'elaborazione)
-        //    await _authenticationDataContext.SaveChangesAsync();
-
-        //    return CreatedAtAction("Registration successfully !", new { id = registerRequest.Id }, registerRequest);
-        //}
-
         // POST: api/Registration
         // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
         [HttpPost("Registration")]
         public async Task<IActionResult> PostRegistration(AuthenticationRequest.RegistrationRequest registerRequest)
         {
             User user = new();
+
+            LoginData loginDatavalue = new();
 
             if (registerRequest == null)
             {
@@ -97,14 +66,16 @@ namespace Management_BE.Controllers.AuthenticationControllers
             // Eseguo l'inserimento dei dati
             User valueInsertData = await _iAuthenticationRepository.CreateAsync(user);
 
+            // Prendo tutte le informazioni dell'utente, compreso le informazioni del ruolo
             var valueQueryJoin = await _iAuthenticationRepository.GetUserWithRoleByIdAsync(valueInsertData.Id);
 
-            // Prendo il valore di riferimento per il ruolo
-            //Role roleValue = await _iAuthenticationRepository.GetRoleByIdAsync(valueInsertData.RoleId);
+            // Inizializzo i dati da inviare al client
+            loginDatavalue.Id = valueQueryJoin.FirstOrDefault().Id;
+            loginDatavalue.Username = valueQueryJoin.FirstOrDefault().Username;
+            loginDatavalue.RoleId = valueQueryJoin.FirstOrDefault().RoleId;
+            loginDatavalue.nameRole = valueQueryJoin.FirstOrDefault().Role.Name;
 
-            //user.Role = roleValue;
-
-            return Ok(valueQueryJoin);
+            return Ok(loginDatavalue);
         }
 
         // POST: api/Login
@@ -113,6 +84,7 @@ namespace Management_BE.Controllers.AuthenticationControllers
         public async Task<IActionResult> PostLogin(AuthenticationRequest.LoginRequest userRequest)
         {
             //AuthenticationRequest.LoginData userData = new();
+            LoginData loginDatavalue = new();
 
             if (userRequest == null)
             {
@@ -141,12 +113,12 @@ namespace Management_BE.Controllers.AuthenticationControllers
             var valueQueryJoin = await _iAuthenticationRepository.GetUserWithRoleByIdAsync(userId.Id);
 
             // Inizializzo l'oggetto da inviare
-            //userData.Id = userId.Id;
-            //userData.Username = userUsername.Username;
-            ////userData.RoleId = userUsername.RoleId;
-            //userData.Role = roleValue;
+            loginDatavalue.Id = valueQueryJoin.FirstOrDefault().Id;
+            loginDatavalue.Username = valueQueryJoin.FirstOrDefault().Username;
+            loginDatavalue.RoleId = valueQueryJoin.FirstOrDefault().RoleId;
+            loginDatavalue.nameRole = valueQueryJoin.FirstOrDefault().Role.Name;
 
-            return Ok(valueQueryJoin);
+            return Ok(loginDatavalue);
         }
 
     }
