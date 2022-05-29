@@ -18,7 +18,8 @@ namespace Management_BE.Controllers.DocumentControllers
     {
         private readonly IDocumentRepository _iDocumentRepository;
 
-        public DocumentController(IDocumentRepository iDocumentRepository)        {
+        public DocumentController(IDocumentRepository iDocumentRepository)
+        {
             _iDocumentRepository = iDocumentRepository;
         }
 
