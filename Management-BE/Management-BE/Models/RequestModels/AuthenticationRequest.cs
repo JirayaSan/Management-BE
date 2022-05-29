@@ -27,7 +27,8 @@ namespace Management_BE.Models.DataModels
             public string Username { get; set; } = string.Empty;
 
             public int RoleId { get; set; }
-            public Role? Role { get; set; }
+            public string nameRole { get; set; } = string.Empty;
+            //public Role? Role { get; set; }
         }
     }
 }

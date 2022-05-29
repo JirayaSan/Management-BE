@@ -9,5 +9,7 @@ namespace Management_BE.Interfaces.Documents
         Task<Document> GetByTitleAsync(string title);
 
         Task<List<Document>> GetDocumentWithUserByIdAsync(int idDocument);
+
+        Task<List<Document>> GetDocumentsByUserIdAsync(int userId);
     }
 }

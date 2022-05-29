@@ -44,6 +44,15 @@ namespace Management_BE.Repositories.Documents
                                 .ToListAsync();
             return documentData;
         }
-        
+
+        public async Task<List<Document>> GetDocumentsByUserIdAsync(int userId)
+        {
+            List<Document> documentData = await _applicationDataContext.Document
+                                            .Where(d => d.UserId == userId)
+                                            .ToListAsync();
+
+            return documentData;
+        }
+
     }
 }

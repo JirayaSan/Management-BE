@@ -21,7 +21,6 @@ namespace Management_BE.Models.DatabaseModels
         public Role? Role { get; set; }
 
         // Document data
-        [JsonIgnore]
         public ICollection<Document>? Documents { get; set; }
     }
 }

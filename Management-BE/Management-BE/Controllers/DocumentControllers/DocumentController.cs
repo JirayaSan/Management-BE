@@ -8,6 +8,7 @@ using Microsoft.EntityFrameworkCore;
 using Management_BE.Models.DatabaseModels;
 using Management_BE.Services;
 using Management_BE.Interfaces.Documents;
+using static Management_BE.Models.RequestModels.DocumentsRequest;
 
 namespace Management_BE.Controllers.DocumentControllers
 {
@@ -17,19 +18,20 @@ namespace Management_BE.Controllers.DocumentControllers
     {
         private readonly IDocumentRepository _iDocumentRepository;
 
-        public DocumentController(IDocumentRepository iDocumentRepository)
-        {
+        public DocumentController(IDocumentRepository iDocumentRepository)        {
             _iDocumentRepository = iDocumentRepository;
         }
 
         [HttpPost("AddDocument")]
-        public async Task<IActionResult> PostAddDocument(Document documentRequest)
+        public async Task<IActionResult> PostAddDocument(DocumentRequest documentRequest)
         {
             Document document = new();
 
+            DocumentData documentData = new();
+
             if (documentRequest == null)
             {
-                return BadRequest(new ErrorResponse("Register data not contains values"));
+                return BadRequest(new ErrorResponse("Document data not contains values"));
             }
 
             // Verifica titolo se già presente
@@ -53,7 +55,44 @@ namespace Management_BE.Controllers.DocumentControllers
 
             var valueQueryJoin = await _iDocumentRepository.GetDocumentWithUserByIdAsync(valueInsertData.Id);
 
-            return Ok(valueQueryJoin);
+            documentData.Id = valueQueryJoin.FirstOrDefault().Id;
+            documentData.Title = valueQueryJoin.FirstOrDefault().Title;
+
+            return Ok(documentData);
+        }
+
+        [HttpPost("AllDocuments")]
+        public async Task<IActionResult> PostAllDocument(int userId)
+        {
+            List<Document> documentsList = new();
+
+            List<DocumentsData> documentsData = new();
+
+            // Verifica dei dati presenti nella richiesta
+            if (userId.ToString() == null)
+            {
+                return BadRequest(new ErrorResponse("User data request not contains values"));
+            }
+
+            // Query per l'acquisizione dei Documenti in base all'id dell'utente
+            documentsList = await _iDocumentRepository.GetDocumentsByUserIdAsync(userId);
+
+            // Inizializzazione dei dati da restituire
+            // Tutte le informazioni (compreso id) del documento, nessuna informazione per l'utente
+            //documentsData = documentsList;
+            documentsData = documentsList.Select(res => new DocumentsData
+            {
+                Id = res.Id,
+                Title = res.Title,
+                Description = res.Description,
+                Comment = res.Comment,
+                DateDocument = res.DateDocument,
+                FilePath = res.FilePath,
+                DateInsertDocument = res.DateDocument,
+                UserId = res.UserId
+            }).ToList();
+
+            return Ok(documentsData);
         }
     }
 }
